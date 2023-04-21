@@ -19,8 +19,18 @@ export const createTask = async (req, res) => {
   }
 };
 export const getAll = async (req, res) => {
+  let tasks;
   try {
-    const tasks = await Tasks.find({ user: req.params.id ,});
+    if (!req.query.color) {
+      tasks = await Tasks.find({
+        user: req.params.id,
+      });
+    } else {
+      tasks = await Tasks.find({
+        user: req.params.id,
+        color: { $in: req.query.color?.split(",") },
+      });
+    }
     if (!tasks) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -31,9 +41,10 @@ export const getAll = async (req, res) => {
 };
 export const getByColor = async (req, res) => {
   try {
-    const tasks = await Tasks.find({ 
-      user: req.params.id ,
-      color: req.params.color});
+    const tasks = await Tasks.find({
+      user: req.params.id,
+      color: req.params.color,
+    });
     if (!tasks) {
       return res.status(404).json({ message: "user or color not found" });
     }
